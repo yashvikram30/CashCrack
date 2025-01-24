@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config();
 
-const JWT_SECRET = "gargie";
+const JWT_SECRET = String(process.env.JWT_SECRET);
 
 export function authMiddleware(
   req: Request,

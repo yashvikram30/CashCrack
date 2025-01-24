@@ -5,6 +5,7 @@ import { User } from "../db/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import { Account } from "../db/bankModel";
 
 const JWT_SECRET = String(process.env.JWT_SECRET);
 
@@ -63,8 +64,14 @@ userRouter.post("/signup", async (req, res) => {
       password: hashedPassword,
     });
 
+    const accountBalance = await Account.create({
+      userId: user._id,
+      balance: Math.floor(Math.random() * 10000) + 1,
+    })
+
     res.status(200).json({
-      message: "User created!",
+      user: user.username,
+      balance: accountBalance.balance
     });
   } catch (e: unknown) {
     console.error("Signup error:", e);
