@@ -26,6 +26,10 @@ const updateSchema = z.object({
   password: z.string().min(6),
 });
 
+const bulkSchema = z.object({
+  filter: z.string(),
+});
+
 userRouter.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, username, password } = req.body;
@@ -136,40 +140,20 @@ userRouter.put("/update", authMiddleware, async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // @ts-ignore
-    console.log("User ID:", req.userId);
-    console.log("Update Data:", {
-      firstName,
-      lastName,
-      hashedPassword
-    });
 
     const result = await User.updateOne(
-
       //@ts-ignore
       { username: req.userId }, // ensure that you put here only what you are signing the jwt with
       {
-        $set: {  // Use $set to ensure partial updates work correctly
+        $set: {
+          // Use $set to ensure partial updates work correctly
           firstName,
           lastName,
-          password: hashedPassword  // or hashedPassword depending on your schema
-        }
+          password: hashedPassword, // or hashedPassword depending on your schema
+        },
       },
-      { runValidators: true }  // This will run schema validations
+      { runValidators: true } // This will run schema validations
     );
-
-    console.log("Update result:", result); 
-    if (result.modifiedCount === 0) {
-      console.log("No document was updated. Possible reasons:");
-      console.log("- User ID might be incorrect");
-      console.log("- No changes detected");
-      
-      res.status(404).json({
-        message: "No updates were made",
-      });
-      return;
-    }
 
     res.json({
       message: "User successfully updated",
@@ -180,4 +164,44 @@ userRouter.put("/update", authMiddleware, async (req, res) => {
       message: "Error occurred",
     });
   }
+});
+
+userRouter.get("/bulk", authMiddleware, async (req, res) => {
+  const { filter } = req.query;
+
+  const validData = bulkSchema.safeParse({ filter });
+  if (!validData.success) {
+    res.json({
+      message: "name should be a string",
+    });
+    return;
+  }
+
+  // basically $or implies that either of the given conditions should be true
+  const users = await User.find({
+    $or: [
+      {
+        firstName: {
+          $regex: filter, //$regex search for the string based on the case-sensitivity
+          $options: "i" // this is used to make the search case insensitive
+        },
+      },
+      {
+        lastName: {
+          $regex: filter,
+          $options: "i"
+        },
+      },
+    ],
+  });
+
+  // return the user here by mapping the individual user and then returning all their data
+  res.json({
+    user: users.map((user) => ({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      id: user._id,
+    })),
+  });
 });
