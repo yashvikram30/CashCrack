@@ -34,9 +34,9 @@ const Dashboard = () => {
 
   return (
     <div className="open-sans-1234">
-      <nav className="bg-gray-800 px-20 py-3 text-slate-100 open-sans-1234 flex justify-between items-center">
-        <p className="font-extrabold text-4xl">CashCrack</p>
-        <div className="flex justify-between items-center gap-3 text-xl">
+      <nav className="bg-gray-800 px-5 md:px-20 py-3 text-slate-100 open-sans-1234 flex justify-between items-center">
+        <p className="font-extrabold text-2xl md:text-4xl">CashCrack</p>
+        <div className="flex justify-between items-center gap-3  text-sm md:text-xl">
           Hello, {userFirstName}
           <img
             src={userSVG}
@@ -66,18 +66,15 @@ const Dashboard = () => {
                 users.user.map((user, index) => (
                   <div
                     key={index}
-                    className="border-b py-2 flex items-center justify-between mb-5 "
+                    className="border-b py-2 flex items-center justify-between mb-5 text-sm md:text-lg"
                   >
                     <div>
                       <p className="font-bold">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-gray-600">
-                        {user.username || "No email provided"}
-                      </p>
                     </div>
                     <div>
-                      <button className="p-3 bg-gray-800 text-white rounded-md hover:bg-gray-950" onClick={() => sendMoney(user)}>Send Money</button>
+                      <button className="p-2 md:p-3 bg-gray-800 text-white rounded-md hover:bg-gray-950 text-sm md:text-lg" onClick={() => sendMoney(user)}>Send Money</button>
                     </div>
                   </div>
                 ))
