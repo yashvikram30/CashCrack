@@ -4,6 +4,8 @@ import { useState } from "react";
 
 export function useFetchUser() {
   const [userFirstName, setUserFirstName] = useState("User");
+  const [userLastName, setUserLastName] = useState("User");
+  const [username, setUsername] = useState("User");
 
   axios.get(`${backend_url}/api/v1/user/details`, {
       headers: {
@@ -12,10 +14,12 @@ export function useFetchUser() {
     })
     .then((response) => {
       setUserFirstName(response.data.firstName);
+      setUserLastName(response.data.lastName);
+      setUsername(response.data.username);
     })
     .catch((error) => {
       console.log("Error occurred: ", error);
     });
 
-    return {userFirstName};
+    return {username,userFirstName,userLastName};
 }
