@@ -130,6 +130,37 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
+userRouter.get("/details",authMiddleware, async(req,res)=>{
+  try{
+    // @ts-ignore
+    const username = req.userId;
+    const user = await User.findOne({
+      username
+    })
+
+    if(!user){
+      res.json({
+        message: "User not found"
+      })
+      return;
+    }
+
+    res.json({
+
+      objectId : user._id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName
+    })
+
+  }catch (e) {
+    console.log("error occurred: ", e);
+    res.json({
+      message: "Error occurred",
+    });
+  }
+})
+
 userRouter.put("/update", authMiddleware, async (req, res) => {
   try {
     const { firstName, lastName, password } = req.body;
